@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: boston-combine-train-
+  annotations:
+    {
+      pipelines.kubeflow.org/kfp_sdk_version: 1.8.5,
+      pipelines.kubeflow.org/pipeline_compilation_time: "2021-11-04T16:19:09.330031",
+      pipelines.kubeflow.org/pipeline_spec:
+        '{"description": "test", "name": "boston
+        combine train"}',
+    }
+  labels: { pipelines.kubeflow.org/kfp_sdk_version: 1.8.5 }
+spec:
+  entrypoint: boston-combine-train
+  templates:
+    - name: boston
+      container:
+        image: "shanau2/boston_pipeline_combine:v0.1.0"
+        command:
+          - python
+          - boston.py
+      metadata:
+        labels:
+          pipelines.kubeflow.org/kfp_sdk_version: 1.8.5
+          pipelines.kubeflow.org/pipeline-sdk-type: kfp
+          pipelines.kubeflow.org/enable_caching: "true"
+    - name: boston-combine-train
+      dag:
+        tasks:
+          - { name: boston, template: boston }
+  arguments:
+    parameters: []
+  serviceAccountName: pipeline-runner
